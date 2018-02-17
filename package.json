@@ -1,0 +1,30 @@
+{
+  "name": "jquery-mobile-movie-lookup",
+  "version": "1.0.0",
+  "description": "Jquery Mobile movie lookup practice application",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm-run-all --parallel build",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "babel src -d dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TheEndurance/jquery-mobile-movie-lookup.git"
+  },
+  "author": "Rawa Jalal",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TheEndurance/jquery-mobile-movie-lookup/issues"
+  },
+  "homepage": "https://github.com/TheEndurance/jquery-mobile-movie-lookup#readme",
+  "dependencies": {
+    "jquery": "^1.9.1",
+    "jquery-mobile": "^1.4.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "npm-run-all": "^4.1.2"
+  }
+}
