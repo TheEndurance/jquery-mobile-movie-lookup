@@ -8,26 +8,34 @@
 	<link rel="stylesheet" href="../node_modules/jquery-mobile/dist/jquery.mobile.min.css" />
 	<script src="../node_modules/jquery/dist/jquery.min.js"></script>
 	<script src="../node_modules/jquery-mobile/dist/jquery.mobile.min.js"></script>
+
 </head>
 
 
 <body>
 
-	<div data-role="page">
-	
-		<div data-role="header">
-			<h1>Page Title</h1>
-		</div><!-- /header -->
-	
+	<div data-role="page" id="home">
+
+		<div data-role="header" data-theme="b">
+			<h1>Movie lookup</h1>
+		</div>
+
 		<div role="main" class="ui-content">
-			<p>Page content goes here.</p>
-		</div><!-- /content -->
-	
-		<div data-role="footer">
+			<form>
+				<div class="ui-field-contain">
+					<input type="text" name="searchText" id="searchText" placeholder="Enter movie name...">
+				</div>
+			</form>
+			<ul id="movieList" data-role="listview">
+
+			</ul>
+		</div>
+
+		<div data-role="footer" data-theme="b">
 			<h4>Page Footer</h4>
-		</div><!-- /footer -->
-	</div><!-- /page -->
-	
-	</body>
+		</div>
+		<script src="index.js"></script>
+	</div>
+</body>
 
 </html>
