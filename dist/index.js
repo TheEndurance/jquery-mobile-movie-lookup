@@ -3,6 +3,8 @@
 var httpRequest = new XMLHttpRequest();
 var searchText = document.getElementById('searchText');
 var listView = document.getElementById('movieList');
+var movieTop = document.getElementById('movieTop');
+var movieDetails = document.getElementById('movieDetails');
 var API = 'http://www.omdbapi.com/?apikey=7823e390';
 var MOVIE_CLICK_CLASS = "js-click-movie";
 
@@ -35,7 +37,7 @@ var searchMovieEventHandler = function searchMovieEventHandler() {
     if (httpRequest.readyState === XMLHttpRequest.DONE) {
         if (httpRequest.status === 200) {
             var markup = renderMovieListItems(JSON.parse(httpRequest.responseText).Search);
-            if (markup) {
+            if (markup !== undefined) {
                 listView.innerHTML = markup;
                 $(listView).listview('refresh');
             }
@@ -51,7 +53,7 @@ var searchMovieEventHandler = function searchMovieEventHandler() {
 var renderMovieListItems = function renderMovieListItems(jsonArray) {
     if (jsonArray === undefined) return;
     return '\n        ' + jsonArray.map(function (movie) {
-        return '<li>\n                <a class="' + MOVIE_CLICK_CLASS + '" data-movie-id="' + movie.imdbID + '" href="#">\n                    <img src="' + movie.Poster + '">\n                    <h2>' + movie.Title + '</h2>\n                    <p>' + movie.Year + '</p>\n                </a>\n            </li> \n        ';
+        return '<li>\n                <a class="' + MOVIE_CLICK_CLASS + '" data-movie-id="' + movie.imdbID + '" href="#movie">\n                    <img src="' + movie.Poster + '">\n                    <h2>' + movie.Title + '</h2>\n                    <p>' + movie.Year + '</p>\n                </a>\n            </li> \n        ';
     }).join('') + '\n    ';
 };
 
@@ -61,11 +63,40 @@ var renderMovieListItems = function renderMovieListItems(jsonArray) {
 var movieClickedEventHandler = function movieClickedEventHandler() {
     if (httpRequest.readyState === XMLHttpRequest.DONE) {
         if (httpRequest.status === 200) {
-            window.sessionStorage.setItem('movie', httpRequest.responseText);
+            var json = JSON.parse(httpRequest.responseText);
+            var markup = renderMovieDetails(json);
+            if (markup !== undefined) {
+                movieTop.innerHTML = '<img src=' + json.Poster + '>';
+                movieDetails.innerHTML = markup;
+                $(movieDetails).listview('refresh');
+            }
         } else {
             alert('There was a problem with the request.');
         }
     }
+};
+
+///
+// Render movie details markup
+///
+var renderMovieDetails = function renderMovieDetails(json) {
+    if (json === undefined) return;
+    return iterateOverMovieJSON(json) + '\n    ';
+};
+
+///
+// Helper function to iterate over JSON keys and values and return listview markup
+///
+var iterateOverMovieJSON = function iterateOverMovieJSON(json) {
+    var markup = "";
+    for (var key in json) {
+        if (json.hasOwnProperty(key)) {
+            if (key != 'Poster') {
+                markup += '<li><p>' + key + ' : ' + json[key] + '</p></li>';
+            }
+        }
+    }
+    return markup;
 };
 
 ///
@@ -78,7 +109,8 @@ searchText.addEventListener('keydown', function (e) {
     }
 }, false);
 
-$('#movieList').on('click', 'a.' + MOVIE_CLICK_CLASS, function () {
+$('#movieList').on('click', 'a.' + MOVIE_CLICK_CLASS, function (e) {
+
     var movieId = this.dataset.movieId;
     if (movieId && movieId.length > 0) {
         callAPI('GET', movieClickedEventHandler, API, ['i=' + movieId]);

@@ -1,6 +1,8 @@
 const httpRequest = new XMLHttpRequest();
 const searchText = document.getElementById('searchText');
 const listView = document.getElementById('movieList');
+const movieTop = document.getElementById('movieTop');
+const movieDetails = document.getElementById('movieDetails');
 const API = 'http://www.omdbapi.com/?apikey=7823e390';
 const MOVIE_CLICK_CLASS = "js-click-movie";
 
@@ -24,7 +26,7 @@ const searchMovieEventHandler = function () {
     if (httpRequest.readyState === XMLHttpRequest.DONE) {
         if (httpRequest.status === 200) {
             const markup = renderMovieListItems(JSON.parse(httpRequest.responseText).Search);
-            if (markup) {
+            if (markup!==undefined) {
                 listView.innerHTML = markup;
                 $(listView).listview('refresh');
             }
@@ -42,7 +44,7 @@ const renderMovieListItems = function (jsonArray) {
     return `
         ${jsonArray.map(movie => 
             `<li>
-                <a class="${MOVIE_CLICK_CLASS}" data-movie-id="${movie.imdbID}" href="#">
+                <a class="${MOVIE_CLICK_CLASS}" data-movie-id="${movie.imdbID}" href="#movie">
                     <img src="${movie.Poster}">
                     <h2>${movie.Title}</h2>
                     <p>${movie.Year}</p>
@@ -58,13 +60,42 @@ const renderMovieListItems = function (jsonArray) {
 const movieClickedEventHandler = function () {
     if (httpRequest.readyState === XMLHttpRequest.DONE) {
         if (httpRequest.status === 200) {
-            window.sessionStorage.setItem('movie', httpRequest.responseText);
+            const json = JSON.parse(httpRequest.responseText)
+            const markup = renderMovieDetails(json);
+            if (markup!==undefined) {
+                movieTop.innerHTML = `<img src=${json.Poster}>`;
+                movieDetails.innerHTML = markup;
+                $(movieDetails).listview('refresh');
+            }
         } else {
             alert('There was a problem with the request.');
         }
     }
 }
 
+///
+// Render movie details markup
+///
+const renderMovieDetails = function (json) {
+    if (json === undefined) return;
+    return `${iterateOverMovieJSON(json)}
+    `;
+}
+
+///
+// Helper function to iterate over JSON keys and values and return listview markup
+///
+const iterateOverMovieJSON = function (json) {
+    let markup = "";
+    for (let key in json) {
+        if (json.hasOwnProperty(key)) {
+            if (key != 'Poster') {
+                markup += `<li><p>${key} : ${json[key]}</p></li>`
+            }
+        }
+    }
+    return markup;
+}
 
 ///
 // Event listeners
@@ -77,7 +108,8 @@ searchText.addEventListener('keydown', function (e) {
 }, false);
 
 
-$('#movieList').on('click', `a.${MOVIE_CLICK_CLASS}`, function () {
+$('#movieList').on('click', `a.${MOVIE_CLICK_CLASS}`, function (e) {
+
     const movieId = this.dataset.movieId
     if (movieId && movieId.length > 0) {
         callAPI('GET', movieClickedEventHandler, API, [`i=${movieId}`]);
